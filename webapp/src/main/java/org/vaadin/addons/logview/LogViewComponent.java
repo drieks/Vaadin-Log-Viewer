@@ -46,8 +46,8 @@ public class LogViewComponent extends CustomComponent {
 	}
 
 	private void createMenu() {
-		MenuItem file = menu.addItem("Datei", null);
-		file.addItem("Speichern", saveCommand);
+		MenuItem file = menu.addItem("File", null);
+		file.addItem("Save", saveCommand);
 		// file.addItem("Beenden", menuCommand);
 	}
 
@@ -55,8 +55,8 @@ public class LogViewComponent extends CustomComponent {
 		@Override
 		public void menuSelected(MenuItem selectedItem) {
 			prefs.putInt("splitter.filter", split.getSplitPosition());
-			filter.save();
-			getWindow().showNotification("Gespeichert!");
+			// filter.save();
+			getWindow().showNotification("saved!");
 		}
 	};
 

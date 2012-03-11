@@ -20,6 +20,9 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Table.TableDragMode;
 import com.vaadin.ui.TableFieldFactory;
+import com.vaadin.ui.Tree;
+import com.vaadin.ui.Tree.CollapseEvent;
+import com.vaadin.ui.Tree.ExpandEvent;
 import com.vaadin.ui.TreeTable;
 import com.vaadin.ui.VerticalLayout;
 
@@ -57,16 +60,8 @@ public class FilterComponent extends CustomComponent {
 					CheckBox ret = new CheckBox();
 					if(treetable.areChildrenAllowed(itemId)) {
 						ret.setVisible(false);
-/*
 					} else {
 						ret.setImmediate(true);
-						ret.addListener(new Property.ValueChangeListener() {
-							@Override
-							public void valueChange(ValueChangeEvent event) {
-								helper.save();
-							}
-						});
-*/
 					}
 					return ret;
 				}
@@ -104,7 +99,7 @@ public class FilterComponent extends CustomComponent {
 				VerticalDropLocation location = dropData.getDropLocation();
 
 				moveNode(sourceItemId, targetItemId, location);
-				// helper.save();
+				helper.save();
 				treetable.refreshRowCache();
 			}
 		});
@@ -115,6 +110,20 @@ public class FilterComponent extends CustomComponent {
 				if(event.getButton() == ClickEvent.BUTTON_LEFT && event.isDoubleClick()) {
 					showSettings(event.getItemId());
 				}
+			}
+		});
+
+		treetable.addListener(new Tree.CollapseListener() {
+			@Override
+			public void nodeCollapse(CollapseEvent event) {
+				helper.save();
+			}
+		});
+
+		treetable.addListener(new Tree.ExpandListener() {
+			@Override
+			public void nodeExpand(ExpandEvent event) {
+				helper.save();
 			}
 		});
 
@@ -169,6 +178,7 @@ public class FilterComponent extends CustomComponent {
 		treetable.setEditable(true);
 
 		helper.load();
+		treetable.refreshRowCache();
 	}
 
 	@SuppressWarnings("unused")
@@ -178,6 +188,7 @@ public class FilterComponent extends CustomComponent {
 		} else {
 			new FilterSettings(getWindow(), treetable.getItem(id));
 		}
+		helper.save();
 	}
 
 	/**
@@ -243,9 +254,5 @@ public class FilterComponent extends CustomComponent {
 		mainLayout.addComponent(treetable);
 
 		return mainLayout;
-	}
-
-	public void save() {
-		helper.save();
 	}
 }

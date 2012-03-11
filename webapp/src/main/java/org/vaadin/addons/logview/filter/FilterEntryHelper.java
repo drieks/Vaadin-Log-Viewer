@@ -9,6 +9,9 @@ import java.util.prefs.Preferences;
 import org.vaadin.addons.logview.LogViewComponent;
 
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.util.HierarchicalContainer;
 import com.vaadin.ui.TreeTable;
 
 public class FilterEntryHelper {
@@ -22,24 +25,26 @@ public class FilterEntryHelper {
 
 	public FilterEntryHelper(TreeTable tt) {
 		this.tt = tt;
+		HierarchicalContainer ds = (HierarchicalContainer)tt.getContainerDataSource();
+		ds.addListener(new Property.ValueChangeListener() {
+			@Override
+			public void valueChange(ValueChangeEvent event) {
+				save();
+			}
+		});
 	}
 
 	public void newItem() {
-		addEntry((int)(Math.random() * Integer.MAX_VALUE), -1, true, false, "Eintrag", "");
-		// save();
-		tt.refreshRowCache();
+		addEntry((int)(Math.random() * Integer.MAX_VALUE), -1, true, false, "Entry", "");
 	}
 
 	public void newCategory() {
-		addEntry((int)(Math.random() * Integer.MAX_VALUE), -1, false, false, "Kategorie", "");
-		// save();
-		tt.refreshRowCache();
+		addEntry((int)(Math.random() * Integer.MAX_VALUE), -1, false, false, "Category", "");
 	}
 
 	public void remove(Object target) {
 		tt.removeItem(target);
-		// save();
-		tt.refreshRowCache();
+		save();
 	}
 
 	public boolean isCategory(Object id) {
@@ -129,16 +134,35 @@ public class FilterEntryHelper {
 			boolean active = p.getBoolean(id + ".active", false);
 			String name = p.get(id + ".name", "" + id);
 			String regex = p.get(id + ".regex", "");
+//			System.err.printf("order:%d, id:%s parent:%s leave:%s active:%s %s\n", i, id, parent, leave, active, name);
 			addEntry(id, parent, leave, active, name, regex);
 		}
-		tt.refreshRowCache();
 	}
 
-	public void save() {
+	private boolean inAction = false;
+
+	public synchronized void save() {
+		if(inAction) {
+			return;
+		}
+		inAction = true;
+
+//		System.err.println("save start");
 		saveEntrys(prefs);
+		tt.refreshRowCache();
+//		System.err.println("save done");
+		inAction = false;
 	}
 
-	public void load() {
+	public synchronized void load() {
+		if(inAction) {
+			return;
+		}
+		inAction = true;
+//		System.err.println("load start");
 		loadEntrys(prefs);
+		tt.refreshRowCache();
+//		System.err.println("load done");
+		inAction = false;
 	}
 }

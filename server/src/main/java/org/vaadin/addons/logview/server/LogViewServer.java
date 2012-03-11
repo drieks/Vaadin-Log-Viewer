@@ -11,7 +11,7 @@ public class LogViewServer {
 	public static void main(String[] args) throws Exception {
 		Server server = new Server();
 		HandlerCollection handlers = new HandlerCollection();
-		handlers.addHandler(new WebAppContext(new File("../.webapp/src/main/webapp").getCanonicalPath(), "/"));
+		handlers.addHandler(new WebAppContext(new File("../webapp/src/main/webapp").getCanonicalPath(), "/"));
 		server.setHandler(handlers);
 		SelectChannelConnector connector = new SelectChannelConnector();
 		connector.setPort(8080);
