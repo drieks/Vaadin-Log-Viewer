@@ -1,0 +1,6 @@
+Manifest-Version: 1.0
+Vaadin-Package-Version: 1
+Vaadin-Addon: ${project.build.finalName}.jar
+Implementation-Vendor: Dennis Rieks
+Implementation-Title: ${vaadin.addon.name}
+Implementation-Version: ${project.version}

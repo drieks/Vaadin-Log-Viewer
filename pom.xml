@@ -1,0 +1,156 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.vaadin.addons</groupId>
+	<artifactId>logview</artifactId>
+	<version>0.1.0-SNAPSHOT</version>
+	<name>Vaadin Log Viewer</name>
+	<description>Log Viewer implemented with Vaadin</description>
+	<packaging>war</packaging>
+
+	<properties>
+		<vaadin.addon.name>Vaadin Log Viewer</vaadin.addon.name>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>com.vaadin</groupId>
+			<artifactId>vaadin</artifactId>
+			<version>6.7.6</version>
+		</dependency>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-user</artifactId>
+			<version>2.4.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>com.google.gwt</groupId>
+			<artifactId>gwt-dev</artifactId>
+			<version>2.4.0</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.validation</groupId>
+			<artifactId>validation-api</artifactId>
+			<version>1.0.0.GA</version>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<build>
+		<outputDirectory>src/main/webapp/WEB-INF/classes</outputDirectory>
+
+		<!-- This is needed for the sources required by the GWT compiler to be 
+			included in the produced JARs -->
+		<resources>
+			<resource>
+				<directory>src/main/java</directory>
+			</resource>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+
+		<plugins>
+			<!-- Compile custom GWT components or widget dependencies with the GWT 
+				compiler -->
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>gwt-maven-plugin</artifactId>
+				<version>2.4.0</version>
+				<configuration>
+					<webappDirectory>src/main/webapp/VAADIN/widgetsets</webappDirectory>
+					<extraJvmArgs>-Xmx1024M -Xss1024k</extraJvmArgs>
+					<hostedWebapp>src/main/webapp</hostedWebapp>
+					<noServer>true</noServer>
+					<module>org.vaadin.addons.logview.widgetset.LogViewWidgetset</module>
+					<runTarget>http://localhost:9998/</runTarget>
+					<draftCompile>true</draftCompile>
+					<style>PRETTY</style>
+				</configuration>
+			</plugin>
+			<!-- This creates a zip file of jar and sources jar. Makes sources available 
+				to maven users automatically?! We could also use this to package required 
+				dependecies for those poor developer souls that still dont know how to use 
+				a build system that supports transient dependencies... -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-assembly-plugin</artifactId>
+				<configuration>
+					<appendAssemblyId>false</appendAssemblyId>
+					<descriptors>
+						<descriptor>assembly.xml</descriptor>
+					</descriptors>
+				</configuration>
+				<executions>
+					<execution>
+						<id>make-assembly</id>
+						<phase>package</phase>
+						<goals>
+							<goal>single</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>2.0.2</version>
+				<configuration>
+					<source>1.6</source>
+					<target>1.6</target>
+					<encoding>${project.build.sourceEncoding}</encoding>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-eclipse-plugin</artifactId>
+				<version>2.8</version>
+				<configuration>
+					<downloadSources>true</downloadSources>
+					<downloadJavadocs>true</downloadJavadocs>
+					<additionalProjectnatures>
+						<projectnature>org.springframework.ide.eclipse.core.springnature</projectnature>
+					</additionalProjectnatures>
+					<additionalBuildcommands>
+						<buildcommand>org.springframework.ide.eclipse.core.springbuilder</buildcommand>
+					</additionalBuildcommands>
+				</configuration>
+			</plugin>
+		</plugins>
+		<pluginManagement>
+			<plugins>
+				<plugin>
+					<groupId>org.apache.maven.plugins</groupId>
+					<artifactId>maven-jar-plugin</artifactId>
+					<configuration>
+						<archive>
+							<index>true</index>
+							<manifest>
+								<!-- Implementation-Title and Implementation-Version come from the 
+									POM by default -->
+								<addDefaultImplementationEntries>true</addDefaultImplementationEntries>
+							</manifest>
+							<manifestEntries>
+								<!-- Package format version - do not change -->
+								<Vaadin-Package-Version>1</Vaadin-Package-Version>
+
+								<!-- Add-on specific fields to update -->
+
+								<!-- Implementation-Title and Implementation-Version come from the 
+									POM by default -->
+								<Implementation-Title>${vaadin.addon.name}</Implementation-Title>
+								<Vaadin-Widgetsets>org.vaadin.addon.logview.widgetset.LogViewWidgetset</Vaadin-Widgetsets>
+							</manifestEntries>
+						</archive>
+					</configuration>
+				</plugin>
+			</plugins>
+		</pluginManagement>
+	</build>
+</project>
