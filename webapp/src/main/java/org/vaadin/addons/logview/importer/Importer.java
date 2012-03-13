@@ -3,10 +3,12 @@ package org.vaadin.addons.logview.importer;
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
 import java.util.Scanner;
+import java.util.prefs.Preferences;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +16,18 @@ import org.vaadin.addons.logview.data.Appender;
 import org.vaadin.addons.logview.data.LogEntry;
 
 public class Importer {
+	public static void load(String prefix, Appender appender) throws IOException, ParseException {
+		Preferences prefs = Preferences.userNodeForPackage(Importer.class);
+		String path = prefs.get("path", null);
+		if(path == null) {
+			throw new RuntimeException("please set path pref!");
+		}
+		InputStream format = Importer.class.getResourceAsStream("../settings/format.properties");
+		Properties props = new Properties();
+		props.load(format);
+		Importer.loadPath(prefix, path, props, appender);
+	}
+
 	public static void loadPath(String prefix, String path, Properties props, Appender appender) throws IOException,
 			ParseException {
 		File dir = new File(path);
