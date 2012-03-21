@@ -3,14 +3,25 @@ package org.vaadin.addons.logview.api;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+
+import org.vaadin.addons.logview.api.RegexParser.MatchResult;
 
 public class LogEntry {
 	private int line;
-	private final LinkedHashMap<String, Object> fields = new LinkedHashMap<String, Object>();
+	private final Map<String, MatchResult> fields;
 	private final LinkedList<String> lines = new LinkedList<String>();
 
-	public void put(String field, Object value) {
+	public LogEntry() {
+		this(new LinkedHashMap<String, MatchResult>());
+	}
+
+	public LogEntry(Map<String, MatchResult> matches) {
+		this.fields = matches;
+	}
+
+	public void put(String field, MatchResult value) {
 		fields.put(field, value);
 	}
 
@@ -26,8 +37,16 @@ public class LogEntry {
 		return lines;
 	}
 
-	public Object get(String key) {
+	public MatchResult get(String key) {
 		return fields.get(key);
+	}
+
+	public String getString(String key) {
+		MatchResult r = fields.get(key);
+		if(r == null) {
+			return null;
+		}
+		return (String)r.value;
 	}
 
 	public int getLine() {
