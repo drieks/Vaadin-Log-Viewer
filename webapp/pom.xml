@@ -20,7 +20,7 @@
 		<dependency>
 			<groupId>com.vaadin</groupId>
 			<artifactId>vaadin</artifactId>
-			<version>6.7.6</version>
+			<version>7.0.0.alpha2</version>
 		</dependency>
 		<dependency>
 			<groupId>com.google.gwt</groupId>
@@ -40,7 +40,19 @@
 			<version>1.0.0.GA</version>
 			<scope>provided</scope>
 		</dependency>
+		<dependency>
+			<groupId>com.github.logview</groupId>
+			<artifactId>api</artifactId>
+			<version>0.1.0-SNAPSHOT</version>
+		</dependency>
 	</dependencies>
+
+	<repositories>
+		<repository>
+			<id>vaadin-addons</id>
+			<url>http://maven.vaadin.com/vaadin-addons</url>
+		</repository>
+	</repositories>
 
 	<build>
 		<outputDirectory>src/main/webapp/WEB-INF/classes</outputDirectory>

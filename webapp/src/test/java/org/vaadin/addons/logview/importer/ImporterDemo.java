@@ -1,10 +1,12 @@
+/*
 package org.vaadin.addons.logview.importer;
 
 import java.io.IOException;
 import java.text.ParseException;
 
-import org.vaadin.addons.logview.data.Appender;
-import org.vaadin.addons.logview.data.LogEntry;
+import org.vaadin.addons.logview.api.Appender;
+import org.vaadin.addons.logview.api.Importer;
+import org.vaadin.addons.logview.api.LogEntry;
 
 public class ImporterDemo implements Appender {
 	@Override
@@ -22,3 +24,4 @@ public class ImporterDemo implements Appender {
 		Importer.load("default", new ImporterDemo());
 	}
 }
+*/
