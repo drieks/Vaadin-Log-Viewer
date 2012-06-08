@@ -1,8 +1,10 @@
+/*
 package org.vaadin.addons.logview.filter;
 
 import java.util.Collection;
 
 import com.vaadin.data.Container;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.BeanItemContainer;
 
 public class HierarchicalBeanItemContainer<T extends HierarchicalBean<T>> extends BeanItemContainer<T> implements
@@ -42,14 +44,21 @@ public class HierarchicalBeanItemContainer<T extends HierarchicalBean<T>> extend
 	@Override
 	public T addItem() {
 		T ret = createItem();
-		addItem(ret, ret);
-		root.add(ret);
+		addItem(ret);
+		return ret;
+	}
+
+	@Override
+	public BeanItem<T> addItem(Object itemId) {
+		T item = convert(itemId);
+		BeanItem<T> ret = addItem(item, item);
+		root.add(item);
 		fireItemSetChange();
 		return ret;
 	}
 
 	@SuppressWarnings("unchecked")
-	private T convert(Object itemId) {
+	public T convert(Object itemId) {
 		return (T)itemId;
 	}
 
@@ -60,6 +69,9 @@ public class HierarchicalBeanItemContainer<T extends HierarchicalBean<T>> extend
 
 	@Override
 	public T getParent(Object itemId) {
+		if(itemId == null) {
+			return null;
+		}
 		return convert(itemId).getParent();
 	}
 
@@ -112,3 +124,4 @@ public class HierarchicalBeanItemContainer<T extends HierarchicalBean<T>> extend
 		return super.toString() + "\n" + root.toString();
 	}
 }
+*/

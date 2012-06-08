@@ -20,7 +20,7 @@ import com.vaadin.ui.Window;
 public class FilterSettingsWindow extends Window {
 	private final VerticalLayout sub = new VerticalLayout();
 
-	public FilterSettingsWindow(final Item item, final FilterSettingContainer container) {
+	public FilterSettingsWindow(final Item item/*, final AbstractFilterSettingContainer container*/) {
 		super("Edit Filter");
 		@SuppressWarnings("unchecked")
 		BeanItem<FilterSettingData> bi = (BeanItem<FilterSettingData>)item;
@@ -48,9 +48,11 @@ public class FilterSettingsWindow extends Window {
 		CheckBox children = new CheckBox("Children allowed?");
 		// don't use FilterSettingContainer.CHILDREN, or getChildren is called...
 		group.bind(children, FilterSettingContainer.GROUP);
+		/* TODO
 		if(data.hasChildren()) {
-			group.setEnabled(false);
+			children.setEnabled(false);
 		}
+		*/
 		addComponent(children);
 
 		// Type
@@ -67,7 +69,7 @@ public class FilterSettingsWindow extends Window {
 				sub.addComponent(data.getType().create(data));
 			}
 		});
-		group.bind(select, FilterSettingContainer.TYPE);
+		// group.bind(select, FilterSettingContainer.TYPE);
 		addComponent(select);
 
 		// Sub Settings
@@ -83,7 +85,7 @@ public class FilterSettingsWindow extends Window {
 					e.printStackTrace();
 				}
 				Root.getCurrentRoot().removeWindow(FilterSettingsWindow.this);
-				container.update();
+				// container.update();
 			}
 		}));
 

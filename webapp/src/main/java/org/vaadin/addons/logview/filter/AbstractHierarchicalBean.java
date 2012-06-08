@@ -1,15 +1,23 @@
+/*
 package org.vaadin.addons.logview.filter;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
 
 import com.google.common.collect.Lists;
 
 public class AbstractHierarchicalBean<T extends HierarchicalBean<T>> implements HierarchicalBean<T> {
 	private final LinkedList<T> childs = Lists.newLinkedList();
 	private boolean areChildrenAllowed = true;
+	private boolean collapsed = false;
 	private T parent;
+
+	@SuppressWarnings("unchecked")
+	public T convert(HierarchicalBean<T> t) {
+		return (T)t;
+	}
 
 	@Override
 	public Collection<T> getChildren() {
@@ -22,7 +30,6 @@ public class AbstractHierarchicalBean<T extends HierarchicalBean<T>> implements 
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void setParent(T parent) {
 		if(this.parent == parent) {
 			return;
@@ -30,19 +37,18 @@ public class AbstractHierarchicalBean<T extends HierarchicalBean<T>> implements 
 		T old = this.parent;
 		this.parent = parent;
 		if(old != null) {
-			old.remove((T)this);
+			old.remove(convert(this));
 		}
 		if(this.parent != null) {
-			this.parent.add((T)this);
+			this.parent.add(convert(this));
 		}
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void add(T node) {
 		if(!childs.contains(node)) {
 			childs.add(node);
-			node.setParent((T)this);
+			node.setParent(convert(this));
 		}
 	}
 
@@ -100,4 +106,23 @@ public class AbstractHierarchicalBean<T extends HierarchicalBean<T>> implements 
 		}
 		return sb.toString();
 	}
+
+	@Override
+	public void setCollapsed(boolean collapsed) {
+		this.collapsed = collapsed;
+	}
+
+	@Override
+	public boolean isCollapsed() {
+		return collapsed;
+	}
+
+	@Override
+	public void getOrder(List<T> ret) {
+		for(T child : getChildren()) {
+			ret.add(child);
+			child.getOrder(ret);
+		}
+	}
 }
+*/

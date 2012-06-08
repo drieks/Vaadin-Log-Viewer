@@ -1,80 +1,108 @@
 package org.vaadin.addons.logview.filter;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.prefs.Preferences;
 
 import org.vaadin.addons.logview.filter.sub.Setting;
 
-import com.google.common.collect.Maps;
+public class FilterSettingData implements Serializable {
+	private final int id;
 
-public class FilterSettingData extends AbstractHierarchicalBean<FilterSettingData> implements Serializable {
-	private String name;
-	private boolean detail;
-	private boolean group;
-	private boolean active;
-	private Setting type;
-	private final Map<String, String> extended = Maps.newHashMap();
+	/*
+	public FilterSettingData() {
+		id = (int)(Math.random() * Integer.MAX_VALUE);
+	}
+	*/
+
+	private transient final Preferences sharedPrefs;
+	private transient final Preferences filterPrefs;
+
+	public FilterSettingData(int order, Preferences sharedPrefs, Preferences filterPrefs) {
+		this.sharedPrefs = sharedPrefs;
+		this.filterPrefs = filterPrefs;
+		id = sharedPrefs.getInt("" + order, (int)(Math.random() * Integer.MAX_VALUE));
+	}
 
 	public String getName() {
-		return name;
+		return sharedPrefs.get(id + ".name", "" + id);
 	}
 
 	public void setName(String name) {
-		this.name = name;
+		sharedPrefs.put(id + ".name", name);
 	}
 
 	public boolean isDetail() {
-		return detail;
+		return sharedPrefs.getBoolean(id + ".detail", false);
 	}
 
 	public void setDetail(boolean detail) {
-		this.detail = detail;
+		sharedPrefs.putBoolean(id + ".detail", detail);
 	}
 
 	public boolean isGroup() {
-		return group;
+		return sharedPrefs.getBoolean(id + ".group", false);
 	}
 
 	public void setGroup(boolean group) {
-		this.group = group;
+		sharedPrefs.putBoolean(id + ".group", group);
 	}
 
 	public boolean isActive() {
-		return active;
+		if(isDetail()) {
+			return false;
+		}
+		return filterPrefs.getBoolean(id + ".active", sharedPrefs.getBoolean(id + ".active", true));
 	}
 
 	public void setActive(boolean active) {
-		this.active = active;
+		sharedPrefs.putBoolean(id + ".active", active);
+		filterPrefs.putBoolean(id + ".active", active);
 	}
 
 	public Setting getType() {
-		return type;
+		return Setting.valueOf(sharedPrefs.get(id + ".type", Setting.GROUP.toString()).toUpperCase());
 	}
 
 	public void setType(Setting type) {
-		this.type = type;
+		if(type == null) {
+			sharedPrefs.remove(id + ".type");
+		} else {
+			sharedPrefs.put(id + ".type", type.toString());
+		}
 	}
 
-	public String getExtendedProperty(String string) {
-		return null;
+	public boolean isCollapsed() {
+		return filterPrefs.getBoolean(id + ".collapsed", sharedPrefs.getBoolean(id + ".collapsed", false));
 	}
 
-	public FilterSettingData getSelf() {
-		return this;
+	public void setCollapsed(boolean collapsed) {
+		sharedPrefs.putBoolean(id + ".collapsed", collapsed);
+		filterPrefs.putBoolean(id + ".collapsed", collapsed);
 	}
 
-	public Map<String, String> getExtended() {
-		return extended;
+	public int getId() {
+		return id;
 	}
 
 	@Override
-	public boolean areChildrenAllowed() {
-		return group;
+	public String toString() {
+		return String.format("data('%s', %s) collapsed:%s", getName(), id, isCollapsed());
 	}
 
-	@Override
-	public boolean setChildrenAllowed(boolean areChildrenAllowed) {
-		this.group = areChildrenAllowed;
-		return true;
+	public void setParent(Integer parent) {
+		String key = id + ".parent";
+		if(parent == null) {
+			sharedPrefs.remove(key);
+		} else {
+			sharedPrefs.putInt(key, parent);
+		}
+	}
+
+	public Integer getParent() {
+		String key = id + ".parent";
+		if(sharedPrefs.get(key, null) == null) {
+			return null;
+		}
+		return sharedPrefs.getInt(key, -1);
 	}
 }

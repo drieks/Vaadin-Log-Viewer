@@ -21,8 +21,8 @@
 		<servlet-name>LogViewer</servlet-name>
 		<servlet-class>com.vaadin.terminal.gwt.server.ApplicationServlet</servlet-class>
 		<init-param>
-			<param-name>application</param-name>
-			<param-value>org.vaadin.addons.logview.LogViewApplication</param-value>
+			<param-name>root</param-name>
+			<param-value>org.vaadin.addons.logview.LogViewRoot</param-value>
 		</init-param>
 		<init-param>
 			<param-name>widgetset</param-name>

@@ -1,6 +1,8 @@
+/*
 package org.vaadin.addons.logview.filter;
 
 import java.util.Collection;
+import java.util.List;
 
 public interface HierarchicalBean<T extends HierarchicalBean<T>> {
 	Collection<T> getChildren();
@@ -22,4 +24,11 @@ public interface HierarchicalBean<T extends HierarchicalBean<T>> {
 	boolean hasChildren(T child);
 
 	void moveAfterSibling(T source, T target);
+
+	void setCollapsed(boolean collapsed);
+
+	boolean isCollapsed();
+
+	void getOrder(List<T> ret);
 }
+*/

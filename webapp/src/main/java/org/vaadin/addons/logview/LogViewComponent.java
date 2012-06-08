@@ -28,6 +28,7 @@ public class LogViewComponent extends CustomComponent {
 
 	private transient final Preferences globalPrefs = Preferences.userNodeForPackage(LogViewTabComponent.class);
 	private transient final Preferences tabPrefs = globalPrefs.node("tabs");
+	private transient final Preferences userPrefs = globalPrefs.node("user");
 
 	public LogViewComponent() {
 		buildMainLayout();
@@ -43,11 +44,27 @@ public class LogViewComponent extends CustomComponent {
 				globalPrefs.putInt("activetab", tabSheet_1.getTabPosition(views.get(lv)));
 			}
 		});
+		setDetailsVisible(userPrefs.getBoolean("detail", false));
 	}
 
+	/*
 	public void updateTabFilter() {
 		for(LogViewTabComponent lv : views.keySet()) {
 			lv.updateTabFilter();
+		}
+	}
+	*/
+
+	public void toogleDetailsVisible() {
+		setDetailsVisible(!detailsVisible);
+	}
+
+	public void setDetailsVisible(boolean detailsVisible) {
+		this.detailsVisible = detailsVisible;
+		userPrefs.putBoolean("detail", detailsVisible);
+		details.setChecked(detailsVisible);
+		for(LogViewTabComponent lv : views.keySet()) {
+			lv.setDetailsVisible(detailsVisible);
 		}
 	}
 
@@ -111,7 +128,7 @@ public class LogViewComponent extends CustomComponent {
 		file.addItem("Close Tab", closeCommand);
 		details = file.addItem("Details", detailsCommand);
 		details.setCheckable(true);
-		details.setChecked(detailsVisble);
+		details.setChecked(detailsVisible);
 	}
 
 	private final Command newCommand = new Command() {
@@ -132,15 +149,13 @@ public class LogViewComponent extends CustomComponent {
 		}
 	};
 
-	private boolean detailsVisble = true;
+	private boolean detailsVisible = true;
 	private MenuItem details;
 
 	private final Command detailsCommand = new Command() {
 		@Override
 		public void menuSelected(MenuItem selectedItem) {
-			detailsVisble = !detailsVisble;
-			details.setChecked(detailsVisble);
-			System.err.println("details:" + detailsVisble);
+			toogleDetailsVisible();
 		}
 	};
 
@@ -149,13 +164,11 @@ public class LogViewComponent extends CustomComponent {
 		// common part: create layout
 		mainLayout = new VerticalLayout();
 		mainLayout.setImmediate(false);
-		mainLayout.setWidth("100%");
-		mainLayout.setHeight("100%");
+		mainLayout.setSizeFull();
 		mainLayout.setMargin(false);
 
 		// top-level component properties
-		setWidth("100.0%");
-		setHeight("100.0%");
+		setSizeFull();
 
 		// menu
 		menu = new MenuBar();
