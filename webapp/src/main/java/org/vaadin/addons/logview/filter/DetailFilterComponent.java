@@ -54,32 +54,19 @@ public class DetailFilterComponent extends FilterComponent {
 				VerticalDropLocation location = dropData.getDropLocation();
 
 				moveNode(sourceItemId, targetItemId, location);
-				// helper.save();
 			}
 		});
 
 		treetable.addActionHandler(new Action.Handler() {
 			@Override
 			public void handleAction(Action action, Object sender, Object target) {
-				FilterSettingData data = getItem(target);
+				FilterSettingData data = getData(target);
 				if(action == ADD_ITEM_ACTION || action == ADD_GROUP_ACTION) {
-					/*
-					FilterSettingData item = getContainer().addItem();
-					getContainer().setParent(item, target);
-					// item.setParent((FilterSettingData)target);
-					if(action == ADD_ITEM_ACTION) {
-						item.setName("Item");
-					} else {
-						item.setChildrenAllowed(true);
-						item.setName("Group");
-					}
-					getContainer().update();
-					*/
+					container.createItem(action == ADD_GROUP_ACTION, getData(target));
+					update();
 				} else if(action == REMOVE_ACTION) {
-					/*
-					getContainer().removeItem(target);
-					getContainer().update();
-					*/
+					container.removeItem(target);
+					update();
 				} else if(action == EDIT_ACTION) {
 					itemClicked(data);
 				} else {
@@ -94,7 +81,7 @@ public class DetailFilterComponent extends FilterComponent {
 					return new Action[] {
 						ADD_ITEM_ACTION, ADD_GROUP_ACTION
 					};
-				} else if(getItem(target).isGroup()) {
+				} else if(getData(target).isGroup()) {
 					// Context menu for an group
 					return new Action[] {
 						ADD_ITEM_ACTION, ADD_GROUP_ACTION, EDIT_ACTION, REMOVE_ACTION
@@ -109,51 +96,30 @@ public class DetailFilterComponent extends FilterComponent {
 		});
 	}
 
-	/**
-	 * Move a node within a tree onto, above or below another node depending
-	 * on the drop location.
-	 * 
-	 * @param sourceItemId
-	 *            id of the item to move
-	 * @param targetItemId
-	 *            id of the item onto which the source node should be moved
-	 * @param location
-	 *            VerticalDropLocation indicating where the source node was
-	 *            dropped relative to the target node
-	 */
 	private void moveNode(Object sourceItemId, Object targetItemId, VerticalDropLocation location) {
-		// Sorting goes as
-		// - If dropped ON a node, we append it as a child
-		// - If dropped on the TOP part of a node, we move/add it before
-		// the node
-		// - If dropped on the BOTTOM part of a node, we move/add it
-		// after the node
-
-		/*
 		if(sourceItemId == targetItemId) {
 			System.err.println("skip drop!");
 			return;
 		}
+		FilterSettingData source = getData(sourceItemId);
+		FilterSettingData target = getData(targetItemId);
+		if(container.isParentOf(source.getId(), target)) {
+			return;
+		}
 		if(location == VerticalDropLocation.MIDDLE) {
-			if(getContainer().areChildrenAllowed(targetItemId) && getContainer().setParent(sourceItemId, targetItemId)
-					&& getContainer().hasChildren(targetItemId)) {
+			if(target.isGroup()) {
+				source.setParent(target.getId());
 				// move first in the container
-				getContainer().moveAfterSibling(sourceItemId, null);
+				container.moveAfterSibling(source, null);
 			}
 		} else if(location == VerticalDropLocation.TOP) {
-			Object parentId = getContainer().getParent(targetItemId);
-			if(getContainer().setParent(sourceItemId, parentId)) {
-				getContainer().moveAfterSibling(sourceItemId, targetItemId);
-			}
+			source.setParent(target.getParent());
+			container.moveAfterSibling(source, target);
+			container.moveAfterSibling(target, source);
 		} else if(location == VerticalDropLocation.BOTTOM) {
-			Object parentId = getContainer().getParent(targetItemId);
-			if(getContainer().setParent(sourceItemId, parentId)) {
-				// reorder only the two items, moving source above target
-				getContainer().moveAfterSibling(sourceItemId, targetItemId);
-				getContainer().moveAfterSibling(targetItemId, sourceItemId);
-			}
+			source.setParent(target.getParent());
+			container.moveAfterSibling(source, target);
 		}
-		getContainer().update();
-		*/
+		update();
 	}
 }

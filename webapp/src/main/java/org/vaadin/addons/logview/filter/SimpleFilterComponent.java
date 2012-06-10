@@ -9,7 +9,7 @@ public class SimpleFilterComponent extends FilterComponent {
 	private final Filter filter = new Filter() {
 		@Override
 		public boolean passesFilter(Object itemId, Item item) throws UnsupportedOperationException {
-			FilterSettingData data = getItem(itemId);
+			FilterSettingData data = getData(itemId);
 			return !data.isDetail();
 		}
 

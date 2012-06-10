@@ -4,7 +4,6 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.util.BeanItem;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.MouseEvents.ClickEvent;
 import com.vaadin.ui.CheckBox;
@@ -26,7 +25,7 @@ public abstract class FilterComponent extends CustomComponent {
 		@Override
 		public void itemClick(ItemClickEvent event) {
 			if(event.getButton() == ClickEvent.BUTTON_LEFT && event.isDoubleClick()) {
-				itemClicked(getItem(event.getItemId()));
+				itemClicked(getData(event.getItemId()));
 			}
 		}
 	};
@@ -34,14 +33,14 @@ public abstract class FilterComponent extends CustomComponent {
 	private final Tree.CollapseListener collapseListener = new Tree.CollapseListener() {
 		@Override
 		public void nodeCollapse(CollapseEvent event) {
-			itemCollapsed(getItem(event.getItemId()), true);
+			itemCollapsed(getData(event.getItemId()), true);
 		}
 	};
 
 	private final Tree.ExpandListener expandListener = new Tree.ExpandListener() {
 		@Override
 		public void nodeExpand(ExpandEvent event) {
-			itemCollapsed(getItem(event.getItemId()), false);
+			itemCollapsed(getData(event.getItemId()), false);
 		}
 	};
 
@@ -65,7 +64,7 @@ public abstract class FilterComponent extends CustomComponent {
 			@Override
 			public Field<?> createField(Container container, final Object itemId, Object propertyId, Component uiContext) {
 				if(FilterSettingContainer.ACTIVE.equals(propertyId)) {
-					final FilterSettingData data = getItem(itemId);
+					final FilterSettingData data = getData(itemId);
 					final CheckBox ret = new CheckBox();
 					if(data.isDetail()) {
 						// ret.setVisible(false);
@@ -101,31 +100,28 @@ public abstract class FilterComponent extends CustomComponent {
 		Root.getCurrentRoot().addWindow(new FilterSettingsWindow(item));
 	}
 
-	protected FilterSettingData getItem(Object itemId) {
-		BeanItem<FilterSettingData> item = container.getItem(itemId);
-		if(item == null) {
-			return null;
-		}
-		return item.getBean();
+	protected FilterSettingData getData(Object itemId) {
+		return container.getData(itemId);
 	}
 
 	public void update() {
 		// reload
 		removeListener();
-		container.removeAllItems();
-		treetable.refreshRowCache();
-		container.load();
+		// container.removeAllItems();
+		// treetable.refreshRowCache();
+		// container.load();
+		container.refresh(treetable);
 		for(Integer id : container.getItemIds()) {
 			// bug fix: expand all nodes
 			treetable.setCollapsed(id, false);
-			FilterSettingData data = getItem(id);
+			FilterSettingData data = getData(id);
 			Integer parent = data.getParent();
 			// null is allowed here
 			treetable.setParent(id, parent);
 		}
 		treetable.refreshRowCache();
 		for(Integer id : container.getItemIds()) {
-			FilterSettingData data = getItem(id);
+			FilterSettingData data = getData(id);
 			if(hasChilds(id, data)) {
 				treetable.setCollapsed(id, data.isCollapsed());
 			} else {

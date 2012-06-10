@@ -7,77 +7,78 @@ import org.vaadin.addons.logview.filter.sub.Setting;
 
 public class FilterSettingData implements Serializable {
 	private final int id;
+	private transient final Preferences globalPrefs;
+	private transient final Preferences configPrefs;
 
-	/*
-	public FilterSettingData() {
-		id = (int)(Math.random() * Integer.MAX_VALUE);
+	public static FilterSettingData forNewId(Preferences globalPrefs, Preferences configPrefs) {
+		return forId((int)(Math.random() * Integer.MAX_VALUE), globalPrefs, configPrefs);
 	}
-	*/
 
-	private transient final Preferences sharedPrefs;
-	private transient final Preferences filterPrefs;
+	public static FilterSettingData forId(int id, Preferences globalPrefs, Preferences configPrefs) {
+		return new FilterSettingData(id, globalPrefs.node("" + id), configPrefs.node("" + id));
+	}
 
-	public FilterSettingData(int order, Preferences sharedPrefs, Preferences filterPrefs) {
-		this.sharedPrefs = sharedPrefs;
-		this.filterPrefs = filterPrefs;
-		id = sharedPrefs.getInt("" + order, (int)(Math.random() * Integer.MAX_VALUE));
+	private FilterSettingData(int id, Preferences globalPrefs, Preferences configPrefs) {
+		this.id = id;
+		this.globalPrefs = globalPrefs;
+		this.configPrefs = configPrefs;
 	}
 
 	public String getName() {
-		return sharedPrefs.get(id + ".name", "" + id);
+		return globalPrefs.get("name", "" + id);
 	}
 
 	public void setName(String name) {
-		sharedPrefs.put(id + ".name", name);
+		globalPrefs.put("name", name);
 	}
 
 	public boolean isDetail() {
-		return sharedPrefs.getBoolean(id + ".detail", false);
+		return globalPrefs.getBoolean("detail", false);
 	}
 
 	public void setDetail(boolean detail) {
-		sharedPrefs.putBoolean(id + ".detail", detail);
+		globalPrefs.putBoolean("detail", detail);
 	}
 
 	public boolean isGroup() {
-		return sharedPrefs.getBoolean(id + ".group", false);
+		return globalPrefs.getBoolean("group", false);
 	}
 
 	public void setGroup(boolean group) {
-		sharedPrefs.putBoolean(id + ".group", group);
+		globalPrefs.putBoolean("group", group);
 	}
 
 	public boolean isActive() {
 		if(isDetail()) {
 			return false;
 		}
-		return filterPrefs.getBoolean(id + ".active", sharedPrefs.getBoolean(id + ".active", true));
+		return configPrefs.getBoolean("active", globalPrefs.getBoolean("active", true));
 	}
 
 	public void setActive(boolean active) {
-		sharedPrefs.putBoolean(id + ".active", active);
-		filterPrefs.putBoolean(id + ".active", active);
+		globalPrefs.putBoolean("active", active);
+		configPrefs.putBoolean("active", active);
 	}
 
 	public Setting getType() {
-		return Setting.valueOf(sharedPrefs.get(id + ".type", Setting.GROUP.toString()).toUpperCase());
+		return Setting.valueOf(globalPrefs.get("type", Setting.GROUP.toString()).toUpperCase());
 	}
 
 	public void setType(Setting type) {
 		if(type == null) {
-			sharedPrefs.remove(id + ".type");
+			globalPrefs.remove("type");
 		} else {
-			sharedPrefs.put(id + ".type", type.toString());
+			globalPrefs.put("type", type.toString());
 		}
 	}
 
 	public boolean isCollapsed() {
-		return filterPrefs.getBoolean(id + ".collapsed", sharedPrefs.getBoolean(id + ".collapsed", false));
+		return configPrefs.getBoolean("collapsed", globalPrefs.getBoolean("collapsed", false));
 	}
 
 	public void setCollapsed(boolean collapsed) {
-		sharedPrefs.putBoolean(id + ".collapsed", collapsed);
-		filterPrefs.putBoolean(id + ".collapsed", collapsed);
+		globalPrefs.putBoolean("collapsed", collapsed);
+		configPrefs.putBoolean("collapsed", collapsed);
 	}
 
 	public int getId() {
@@ -90,19 +91,19 @@ public class FilterSettingData implements Serializable {
 	}
 
 	public void setParent(Integer parent) {
-		String key = id + ".parent";
+		String key = "parent";
 		if(parent == null) {
-			sharedPrefs.remove(key);
+			globalPrefs.remove(key);
 		} else {
-			sharedPrefs.putInt(key, parent);
+			globalPrefs.putInt(key, parent);
 		}
 	}
 
 	public Integer getParent() {
-		String key = id + ".parent";
-		if(sharedPrefs.get(key, null) == null) {
+		String key = "parent";
+		if(globalPrefs.get(key, null) == null) {
 			return null;
 		}
-		return sharedPrefs.getInt(key, -1);
+		return globalPrefs.getInt(key, -1);
 	}
 }
