@@ -41,6 +41,10 @@ public class DetailLogEntry implements Serializable {
 
 	public String getClassName() {
 		return entry.getLine().toString(3).trim();
+		/*
+		return "" + (getId() / TableBlockCache.BLOCK_SIZE) + "/" + (getId() % TableBlockCache.BLOCK_SIZE) + "="
+		+ getId() + entry.getLine().toString(3).trim();
+		*/
 	}
 
 	public String getMessage() {
