@@ -14,21 +14,15 @@ import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.tools.bzip2.CBZip2OutputStream;
-import org.vaadin.addons.logview.table.DetailLogEntry;
 
 import com.github.logview.api.LogEntry;
 import com.github.logview.importer.LogEntryTask;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.google.common.collect.ImmutableMap;
-import com.google.gwt.thirdparty.guava.common.collect.Sets;
 
 public class Bz2LogEntryTask extends LogEntryTask {
 	private static final int MAX_SIZE = 2500;
@@ -118,58 +112,37 @@ public class Bz2LogEntryTask extends LogEntryTask {
 			PrintWriter out = new PrintWriter(os);
 			long s = 0;
 			int l = 0;
-			GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("UTC"));
+			GregorianCalendar cal = new GregorianCalendar(TimeZone.getTimeZone("CET"));
 			cal.clear();
 			cal.set(2012, 1, 1);
-
-			LoadingCache<String, LoadingCache<String, Set<Integer>>> tags = CacheBuilder.newBuilder().build(
-				new CacheLoader<String, LoadingCache<String, Set<Integer>>>() {
-					@Override
-					public LoadingCache<String, Set<Integer>> load(final String tag) throws Exception {
-						System.err.println("new tag " + tag);
-						return CacheBuilder.newBuilder().build(new CacheLoader<String, Set<Integer>>() {
-							@Override
-							public Set<Integer> load(String name) throws Exception {
-								System.err.println("new tag " + tag + ":" + name);
-								return Sets.newLinkedHashSet();
-							}
-						});
-					}
-				});
 
 			long from = ((Date)entrys.getFirst().getLine().getValue(0)).getTime() + cal.getTimeInMillis();
 			long to = ((Date)entrys.getLast().getLine().getValue(0)).getTime() + cal.getTimeInMillis();
 			resetLevels();
 			for(LogEntry entry : entrys) {
-				DetailLogEntry d = new DetailLogEntry(entry);
 				String level = (String)entry.getLine().getValue(1);
 				level = level.toLowerCase().trim();
 				levels.get(level).incrementAndGet();
 				String source = entry.getLine().getSource();
 				out.println(source);
 				s += source.getBytes().length;
-				tags.getUnchecked("class").getUnchecked(d.getClassName()).add(l);
-				tags.getUnchecked("level").getUnchecked(d.getLevel()).add(l);
-				for(String ndc : d.getNDC().split(" ")) {
-					ndc = ndc.trim();
-					if(ndc.length() != 0) {
-						tags.getUnchecked("ndc").getUnchecked(ndc).add(l);
-					}
-				}
 				l++;
-				System.err.println(entry.getLine());
+				// System.err.println(entry.getLine());
 				for(String line : entry.getLines()) {
 					l++;
 					out.println(line);
 					s += line.getBytes().length;
 				}
 			}
+			/*
+			System.err.println("\n\n\n");
 			for(Entry<String, LoadingCache<String, Set<Integer>>> tag : tags.asMap().entrySet()) {
 				for(Entry<String, Set<Integer>> name : tag.getValue().asMap().entrySet()) {
 					System.err.printf("%s:%s %d\n", tag.getKey(), name.getKey(), name.getValue().size());
 				}
 			}
 			System.exit(0);
+			*/
 			out.close();
 			os.close();
 			byte[] data = bao.toByteArray();

@@ -1,5 +1,6 @@
 package org.vaadin.addons.logview.table;
 
+import com.github.logview.api.DetailLogEntry;
 import com.google.common.collect.ImmutableMap;
 import com.jensjansson.pagedtable.PagedTable;
 import com.vaadin.data.Container;
